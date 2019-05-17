@@ -71,12 +71,12 @@ class RefreshMenuPermissions extends Command
         $menuItems = MenuItem::all();
         foreach($menuItems as $menuItem){
             if ($menuItem['generate_permission'] == 'ALL'){
-                Permission::create(['name' => 'create_'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->cPermission['id'], 'menu_item_id' => $menuItem['id']]);
-                Permission::create(['name' => 'read_'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->rPermission['id'], 'menu_item_id' => $menuItem['id']]);
-                Permission::create(['name' => 'update_'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->uPermission['id'], 'menu_item_id' => $menuItem['id']]);
-                Permission::create(['name' => 'delete_'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->dPermission['id'], 'menu_item_id' => $menuItem['id']]);
+                Permission::create(['name' => 'create'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->cPermission['id'], 'menu_item_id' => $menuItem['id']]);
+                Permission::create(['name' => 'read'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->rPermission['id'], 'menu_item_id' => $menuItem['id']]);
+                Permission::create(['name' => 'update'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->uPermission['id'], 'menu_item_id' => $menuItem['id']]);
+                Permission::create(['name' => 'delete'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->dPermission['id'], 'menu_item_id' => $menuItem['id']]);
             }
-            Permission::create(['name' => 'manage_'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->mPermission['id'], 'menu_item_id' => $menuItem['id']]);
+            Permission::create(['name' => 'manage'.str_replace('/','_',strtolower($menuItem['route'])), 'permission_type_id' => $this->mPermission['id'], 'menu_item_id' => $menuItem['id']]);
         }
     }
     
