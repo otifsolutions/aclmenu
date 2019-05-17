@@ -10,14 +10,16 @@
         }
     ],
     "require": {},
+    "autoload": {
+            "psr-4": {
+                "OTIFSolutions\\ACLMenu\\": "src/"
+            }
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "OTIFSolutions\\ACLMenu\\ACLMenuServiceProvider"
-            ],
-            "aliases": {
-                "Debugbar": "OTIFSolutions\\ACLMenu\\Facade"
-            }
+            ]
         }
     }
 }
