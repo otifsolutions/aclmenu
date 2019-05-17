@@ -2,7 +2,7 @@
     "name": "otifsolutions/aclmenu",
     "description": "An ACL Menu Package that includes User Roles, Permissions, Db based Menu Items, rights and permission based menu items",
     "type": "library",
-    "license": "MIT License",
+    "license": "MIT",
     "authors": [
         {
             "name": "OTIF Solutions",
