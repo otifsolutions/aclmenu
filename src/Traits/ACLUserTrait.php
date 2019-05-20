@@ -17,6 +17,13 @@ trait ACLUserTrait{
         return $this->hasOne('OTIFSolutions\ACLMenu\Models\Team','user_id');
     }
     
+    public function team(){
+        if ($this->isChildAccount())
+            return $this->child_team();
+        else
+            return $this->parent_team();
+    }
+    
     public function isChildAccount(){
         return $this['team_id'] === null;
     }
