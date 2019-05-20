@@ -15,4 +15,7 @@ class UserRole extends Model
     {
         return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\MenuItem');
     }
+    public function team(){
+        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\Team','team_id');
+    }
 }
