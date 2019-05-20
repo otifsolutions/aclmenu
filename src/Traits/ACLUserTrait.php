@@ -9,6 +9,18 @@ trait ACLUserTrait{
         return $this->belongsTo('OTIFSolutions\ACLMenu\Models\UserRole');
     }
     
+    public function parent_team(){
+        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\Team','team_id');
+    }
+    
+    public function child_team(){
+        return $this->hasOne('OTIFSolutions\ACLMenu\Models\Team','user_id');
+    }
+    
+    public function isChildAccount(){
+        return $this['team_id'] === null;
+    }
+    
     public function hasPermission($permissionTypeString = 'READ')
     {
         if ($permissionTypeString == null || $permissionTypeString == '') return false;

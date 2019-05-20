@@ -13,8 +13,9 @@ class UserRole
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next, $permission)
+    public function handle($request, Closure $next, $permission = null)
     {
+        if ($permission == null) $permission = $request->path();
         if ($request->user() == null) return redirect('/');
         if(sizeof($request->user()['user_role']->permissions()->where('name','LIKE','%'.$permission)->get()) != 0)
         {
