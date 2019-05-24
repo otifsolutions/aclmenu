@@ -18,4 +18,7 @@ class UserRole extends Model
     public function team(){
         return $this->belongsTo('OTIFSolutions\ACLMenu\Models\Team','team_id');
     }
+    public function users(){
+        return $this->hasMany('App\User','user_role_id');
+    }
 }

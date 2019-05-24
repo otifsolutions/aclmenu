@@ -28,11 +28,14 @@ trait ACLUserTrait{
         return $this['team_id'] === null;
     }
     
-    public function hasPermission($permissionTypeString = 'READ')
+    public function hasPermission($permissionTypeString = 'READ', $permission = null)
     {
         if ($permissionTypeString == null || $permissionTypeString == '') return false;
         $permissionTypeString = strtolower($permissionTypeString);
-        $currentPermission = \Session::get('current_permission');
+        if ($permission !== null)
+            $currentPermission = $permission;
+        else
+            $currentPermission = \Session::get('current_permission');
         $permissionTypeStrings = explode('|',$permissionTypeString);
         $permissions = $this['user_role']->permissions()->where('name','LIKE','%'.$currentPermission)->get();
         if (sizeof($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
