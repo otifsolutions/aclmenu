@@ -12,6 +12,6 @@ class UserRoleGroup extends Model
     }
     public function user_roles()
     {
-        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\UserRole','user_role_group_user_role','user_role_group_id','user_role_id');
+        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\UserRole','group_role','user_role_group_id','user_role_id');
     }
 }

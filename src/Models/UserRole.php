@@ -23,6 +23,6 @@ class UserRole extends Model
     }
     public function groups()
     {
-        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\UserRoleGroup','user_role_group_user_role','user_role_id','user_role_group_id');
+        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\UserRoleGroup','group_role','user_role_id','user_role_group_id');
     }
 }

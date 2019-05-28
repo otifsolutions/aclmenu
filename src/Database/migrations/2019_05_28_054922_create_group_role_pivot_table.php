@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserRoleGroupUserRolePivotTable extends Migration
+class CreateGroupRolePivotTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateUserRoleGroupUserRolePivotTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_role_group_user_role', function (Blueprint $table) {
+        Schema::create('group_role', function (Blueprint $table) {
             $table->integer('user_role_group_id')->unsigned()->index();
             $table->foreign('user_role_group_id')->references('id')->on('user_role_groups')->onDelete('cascade');
             $table->integer('user_role_id')->unsigned()->index();
@@ -28,6 +28,6 @@ class CreateUserRoleGroupUserRolePivotTable extends Migration
      */
     public function down()
     {
-        Schema::drop('user_role_group_user_role');
+        Schema::drop('group_role');
     }
 }
