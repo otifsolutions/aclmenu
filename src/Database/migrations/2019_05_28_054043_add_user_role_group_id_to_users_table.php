@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddDetailsToUsersTable extends Migration
+class AddUserRoleGroupIdToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,10 +14,8 @@ class AddDetailsToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function($table) {
-            $table->integer('user_role_id')->unsigned()->nullable();
-            $table->foreign('user_role_id')->references('id')->on('user_roles');
-            $table->integer('team_id')->unsigned()->nullable();
-            $table->foreign('team_id')->references('id')->on('teams');
+            $table->integer('user_role_group_id')->unsigned()->nullable();
+            $table->foreign('user_role_group_id')->references('id')->on('user_role_groups');
         });
     }
 
@@ -29,8 +27,7 @@ class AddDetailsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function($table) {
-            $table->dropColumn('user_role_id');
-            $table->dropColumn('team_id');
+            $table->dropColumn('user_role_group_id');
         });
     }
 }
