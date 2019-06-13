@@ -17,7 +17,15 @@ class UserRole
     {
         if ($permission == null) $permission = $request->path();
         if ($request->user() == null) return redirect('/');
-        if(sizeof($request->user()['user_role']->permissions()->where('name','LIKE','%'.$permission)->get()) != 0)
+        if ($request->user()['group'] !== null)
+            foreach($request->user()['group']['user_roles'] as $userRole){
+                if(sizeof($userRole->permissions()->where('name','LIKE','%'.$permission)->get()) != 0)
+                {
+                    \Session::put('current_permission', $permission);
+                    return $next($request);
+                }
+            }
+        else if(sizeof($request->user()['user_role']->permissions()->where('name','LIKE','%'.$permission)->get()) != 0)
         {
             \Session::put('current_permission', $permission);
             return $next($request);
