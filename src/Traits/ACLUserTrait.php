@@ -52,6 +52,21 @@ trait ACLUserTrait{
             }
         return false;
     }
+    public function hasPermissionMenuItem($id){
+        if ($this['group'] === null)
+            if ($this['user_role'] === null)
+                return false;
+            else{
+                $permission = $this['user_role']->permissions()->where('menu_item_id',$id)->first();
+                if ($permission !== null) return true;
+            }
+        else
+            foreach($this['group']['user_roles'] as $userRole){
+                $permission = $userRole->permissions()->where('menu_item_id',$id)->first();
+                if ($permission !== null) return true;
+            }
+        return false;
+    }
 }
 
 
