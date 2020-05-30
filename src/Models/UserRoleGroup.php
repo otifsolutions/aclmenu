@@ -1,6 +1,6 @@
 <?php
 
-namespace OTIFSolutions\ACLMenu\Modals;
+namespace OTIFSolutions\ACLMenu\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
