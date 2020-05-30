@@ -7,7 +7,7 @@ trait ACLUserTrait{
         return $this->belongsTo('OTIFSolutions\ACLMenu\Models\UserRole');
     }
     public function group(){
-        return $this->belongsTo('OTIFSolutions\ACLMenu\Modals\UserRoleGroup','user_role_group_id');
+        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\UserRoleGroup','user_role_group_id');
     }
     public function parent_team(){
         return $this->belongsTo('OTIFSolutions\ACLMenu\Models\Team','team_id');
