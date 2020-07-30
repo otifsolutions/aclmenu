@@ -39,7 +39,7 @@ trait ACLUserTrait{
                 $permissions = $this['user_role']->permissions()->where('name','LIKE','%'.$currentPermission)->get();
                 if (sizeof($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
                 foreach ($permissionTypeStrings as $permissionTypeString)
-                    if (sizeof($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0) 
+                    if (sizeof($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0)
                         return true;
             }
         else
@@ -47,7 +47,7 @@ trait ACLUserTrait{
                 $permissions = $userRole->permissions()->where('name','LIKE','%'.$currentPermission)->get();
                 if (sizeof($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
                 foreach ($permissionTypeStrings as $permissionTypeString)
-                    if (sizeof($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0) 
+                    if (sizeof($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0)
                         return true;
             }
         return false;
@@ -66,6 +66,10 @@ trait ACLUserTrait{
                 if ($permission !== null) return true;
             }
         return false;
+    }
+    public function getTeamOwnerAttribute()
+    {
+        return $this['team']['owner'] == null ? $this : $this['team']['owner'];
     }
 }
 
