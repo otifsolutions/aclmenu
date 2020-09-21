@@ -2,27 +2,27 @@
 
 namespace OTIFSolutions\ACLMenu\Models;
 
-use App;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class UserRole extends Model
 {
     public function permissions()
     {
-        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\Permission');
+        return $this->belongsToMany(Permission::class);
     }
     public function menu_items()
     {
-        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\MenuItem');
+        return $this->belongsToMany(MenuItem::class);
     }
     public function team(){
-        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\Team','team_id');
+        return $this->belongsTo(Team::class,'team_id');
     }
     public function users(){
-        return $this->hasMany('App\User','user_role_id');
+        return $this->hasMany(User::class,'user_role_id');
     }
     public function groups()
     {
-        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\UserRoleGroup','group_role','user_role_id','user_role_group_id');
+        return $this->belongsToMany(UserRoleGroup::class,'group_role','user_role_id','user_role_group_id');
     }
 }

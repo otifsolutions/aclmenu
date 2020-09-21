@@ -2,18 +2,22 @@
 
 namespace OTIFSolutions\ACLMenu\Traits;
 
+use OTIFSolutions\ACLMenu\Models\Team;
+use OTIFSolutions\ACLMenu\Models\UserRole;
+use OTIFSolutions\ACLMenu\Models\UserRoleGroup;
+
 trait ACLUserTrait{
     public function user_role(){
-        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\UserRole');
+        return $this->belongsTo(UserRole::class);
     }
     public function group(){
-        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\UserRoleGroup','user_role_group_id');
+        return $this->belongsTo(UserRoleGroup::class,'user_role_group_id');
     }
     public function parent_team(){
-        return $this->belongsTo('OTIFSolutions\ACLMenu\Models\Team','team_id');
+        return $this->belongsTo(Team::class,'team_id');
     }
     public function child_team(){
-        return $this->hasOne('OTIFSolutions\ACLMenu\Models\Team','user_id');
+        return $this->hasOne(Team::class,'user_id');
     }
     public function team(){
         if ($this->isChildAccount())

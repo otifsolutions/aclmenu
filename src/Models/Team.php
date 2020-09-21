@@ -2,23 +2,24 @@
 
 namespace OTIFSolutions\ACLMenu\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Team extends Model
 {
     public function owner(){
-        return $this->belongsTo('App\User','user_id');
+        return $this->belongsTo(User::class,'user_id');
     }
-    
+
     public function permissions(){
-        return $this->belongsToMany('OTIFSolutions\ACLMenu\Models\Permission');
+        return $this->belongsToMany(Permission::class);
     }
-    
+
     public function members(){
-        return $this->hasMany('App\User','team_id');
+        return $this->hasMany(User::class,'team_id');
     }
-    
+
     public function user_roles(){
-        return $this->hasMany('OTIFSolutions\ACLMenu\Models\UserRole','team_id');
+        return $this->hasMany(UserRole::class,'team_id');
     }
 }
