@@ -7,8 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Team extends Model
 {
+    protected $guarded = ['id'];
+
     public function owner(){
-        return $this->belongsTo(User::class,'user_id');
+        return $this->belongsTo(config('laravelacl.models.user'),'user_id');
     }
 
     public function permissions(){
@@ -16,7 +18,7 @@ class Team extends Model
     }
 
     public function members(){
-        return $this->hasMany(User::class,'team_id');
+        return $this->hasMany(config('laravelacl.models.user'),'team_id');
     }
 
     public function user_roles(){

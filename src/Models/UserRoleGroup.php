@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserRoleGroup extends Model
 {
+    protected $guarded = ['id'];
+
     public function users()
     {
-        $this->hasMany(User::class,'user_role_group_id');
+        $this->hasMany(config('laravelacl.models.user'),'user_role_group_id');
     }
     public function user_roles()
     {

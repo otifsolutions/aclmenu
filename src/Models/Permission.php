@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-    protected $fillable = ['name', 'permission_type_id', 'menu_item_id'];
+    protected $guarded = ['id'];
 
     public function menu_item()
     {

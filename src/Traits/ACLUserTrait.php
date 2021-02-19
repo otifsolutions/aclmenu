@@ -41,17 +41,17 @@ trait ACLUserTrait{
                 return false;
             else{
                 $permissions = $this['user_role']->permissions()->where('name','LIKE','%'.$currentPermission)->get();
-                if (sizeof($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
+                if (count($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
                 foreach ($permissionTypeStrings as $permissionTypeString)
-                    if (sizeof($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0)
+                    if (count($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0)
                         return true;
             }
         else
             foreach($this['group']['user_roles'] as $userRole){
                 $permissions = $userRole->permissions()->where('name','LIKE','%'.$currentPermission)->get();
-                if (sizeof($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
+                if (count($permissions->where('name','LIKE','manage_'.$currentPermission)) != 0) return true;
                 foreach ($permissionTypeStrings as $permissionTypeString)
-                    if (sizeof($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0)
+                    if (count($permissions->where('name','LIKE',$permissionTypeString.'_'.$currentPermission)) != 0)
                         return true;
             }
         return false;

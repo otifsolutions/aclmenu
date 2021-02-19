@@ -8,6 +8,7 @@ class ACLMenuServiceProvider extends ServiceProvider {
     
     public function boot()
     {
+        $this->registerConfig();
         $this->loadRoutesFrom(__DIR__.'/routes/web.php');
         $this->loadMigrationsFrom(__DIR__.'/Database/migrations');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'acl-menu');
@@ -24,6 +25,16 @@ class ACLMenuServiceProvider extends ServiceProvider {
     public function register()
     {
         
+    }
+
+    protected function registerConfig()
+    {
+        $this->publishes([
+            __DIR__.'/Config/config.php' => config_path('laravelacl.php'),
+        ], 'config');
+        $this->mergeConfigFrom(
+            __DIR__.'/Config/config.php', 'laravelacl'
+        );
     }
     
 }
