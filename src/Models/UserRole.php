@@ -2,7 +2,6 @@
 
 namespace OTIFSolutions\ACLMenu\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class UserRole extends Model
