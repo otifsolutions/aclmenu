@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'redirect_to' => '/',
+    'redirect_url' => '/',
     'models' => [
         'user'   => config('auth.providers.users.model')
     ]
