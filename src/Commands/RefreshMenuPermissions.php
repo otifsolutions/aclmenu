@@ -51,11 +51,11 @@ class RefreshMenuPermissions extends Command
      * @return void
      */
     private function PermissionTypeTableSeeder(){
-        $this->cPermission = PermissionType::create(['name' => 'CREATE']);
-        $this->rPermission = PermissionType::create(['name' => 'READ']);
-        $this->uPermission = PermissionType::create(['name' => 'UPDATE']);
-        $this->dPermission = PermissionType::create(['name' => 'DELETE']);
-        $this->mPermission = PermissionType::create(['name' => 'MANAGE']);
+        $this->cPermission = PermissionType::updateOrCreate(['name' => 'CREATE']);
+        $this->rPermission = PermissionType::updateOrCreate(['name' => 'READ']);
+        $this->uPermission = PermissionType::updateOrCreate(['name' => 'UPDATE']);
+        $this->dPermission = PermissionType::updateOrCreate(['name' => 'DELETE']);
+        $this->mPermission = PermissionType::updateOrCreate(['name' => 'MANAGE']);
     }
     
     /**
