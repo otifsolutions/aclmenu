@@ -28,7 +28,8 @@ trait ACLUserTrait{
     public function isChildAccount(){
         return $this['team_id'] === null;
     }
-    public function hasPermission($permissionTypeString = 'READ', $permission = null){
+    public function hasPermission($permissionTypeString = 'READ', $permission = null)
+    {
         if ($permissionTypeString == null || $permissionTypeString == '') return false;
         $permissionTypeString = strtolower($permissionTypeString);
         if ($permission !== null)
@@ -56,7 +57,8 @@ trait ACLUserTrait{
             }
         return false;
     }
-    public function hasPermissionMenuItem($id){
+    public function hasPermissionMenuItem($id)
+    {
         if ($this['group'] === null)
             if ($this['user_role'] === null)
                 return false;
@@ -64,11 +66,12 @@ trait ACLUserTrait{
                 $permission = $this['user_role']->permissions()->where('menu_item_id',$id)->first();
                 if ($permission !== null) return true;
             }
-        else
-            foreach($this['group']['user_roles'] as $userRole){
-                $permission = $userRole->permissions()->where('menu_item_id',$id)->first();
+        else {
+            foreach ($this['group']['user_roles'] as $userRole) {
+                $permission = $userRole->permissions()->where('menu_item_id', $id)->first();
                 if ($permission !== null) return true;
             }
+        }
         return false;
     }
     public function getTeamOwnerAttribute()

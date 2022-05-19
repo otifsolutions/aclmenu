@@ -22,22 +22,18 @@ Either run the following command in the root directory of your project:
 composer require otifsolutions/aclmenu
 ```
 
-### Steps To Use
+### Steps
 
-Create user role and menu items via seeder and then create default user permissions sync seeder to sync permissions.
-
-1. Create UserRole  ( via Seeder )
+1. Create User Role  ( via Seeder )
 
 ```php
  UserRole::updateOrCreate(
     ['id' => 1],[
-        'name' => 'USERTYPE'
+        'name' => 'ADMIN'
     ]);
 ```
 
-`name` is user type might be ADMIN, EMPLOYEE or COSTUMER
-
-2. Create Menu Items against User Roles.
+2. Create Menu Items for Created `UserRole`.
 
 ```php
  MenuItem::updateOrCreate(
@@ -45,17 +41,32 @@ Create user role and menu items via seeder and then create default user permissi
         'order_number'=> 'any',
         'parent_id' => 'any',
         'icon' => 'feather icon-home',
-        'name' => 'dashboard',
-        'route' => '/dashboard',
+        'name' => 'chart',
+        'route' => '/chart',
          'generate_permission' => 'ALL'
      ])
      ->user_roles()
      ->sync([1]);
 ```
 
-here `order_number` is the number of item that we want to show in an order and `parent_id` is id of that parent_item.
+| Option       | type          |Description                         |
+|-------------:|--------------:|-----------------------------------:|
+|`order_number`|  INT          |number to show the item in sequence,|
+| `parent_id`  |  INT          |We use it to add any item as a sub menu of parent item
+| `icon`       |  Varchar      |icon of created menu item.          |
+| `name`       |  Varchar      |show the name of created menu item.          |
+| `route`      |  Varchar      |middleware route to Restrict Unauthorized User Access        | 
 
-3. sync Permissions against those menu Items.
+- `generate_permission` is `ENUM` type of granted permission to the User Role, that are
+  'ALL', 'MANAGE_ONLY', 'READ_ONLY'.
+
+| Option      |Description                                     |
+|------------:|-----------------------------------------------:|
+| All         | Allow user role to create, read, update, delete|
+| MANAGE_ONLY | Allow user role manage.                        |
+| READ_ONLY   | show that User can only read.                            | 
+
+3. Sync Permissions against Menu Items.
 
 ```php
 {
@@ -63,35 +74,71 @@ here `order_number` is the number of item that we want to show in an order and `
  $permissions = Permission::whereIn('menu_item_id',$userRole->menu_items()->pluck('id'))->pluck('id');
  $userRole->permissions()->sync($permissions);
 }
-```
-
-Run the seeders first to implement the changes
 
 ```
-php artisan db:seed
-```
-Add following command in DatabaseSeeder after UsersTableSeeder
+
+4. #### ACLUserTrait
+
+* Use `ACLUserTrait` in `App/Models/User`,
+* ACLUserTrait has all User Roles, Teams and Groups.
+* The user role may be an Admin or owner.
+* It checks If user role or user role of a group has permission of menu item, it will be returned otherwise not return.
+* ACLUserTrait fetches all the described attributes when we use the trait in `User` model
+
+5. Register the artisan command in database seeder after `$this->call(UsersTablesSeeder::class) ` in
+   App/Database/Seeder/DatabaseSeeder file;
 
 ```
 Artisan::call('aclmenu:refresh');
 ```
-Teams Can be Created Via Seeder
 
-### Goals
+6. Run the seeder to implement the changes
 
+```
+php artisan db:seed
+```
+### Middleware
 
-- Routes Middleware to Restrict Unauthorized User Access
-- In Controller Check permission via `hasPermission` method.
+- Middleware Handle an incoming request.
+- If user role or group role is has permission or is authenticated, user is redirected to the homepage.
+- If user role or group role is has not permissions, it will be redirected to the dashboard.
+- Middleware parameters are specified when defining the route by separating the middleware name and parameters with a
+  colon `:`
+  e.g. `->middleware('role:chart')`.
+- Get or set the middlewares attached to the route, the middleware will Restrict Unauthorized User Access.
 
-✨####Permission Handling✨
+### MODELS
 
-- Add User role against a team e.g Manager
-- Assign Permissions for that User Role.
-- Team members will be created against that User Role
++ MenuItem
+    * MenuItem model on-to-Many relation with the child item and permissions,
+    * One MenuItem can have more than one child items and permissions.
+    * MenuItem Model also define a many-to-many inverse relationship to allow a UserRole to access all MenuItems.
 
-### details
++ User Role
+    * Create user
+    * Assign the role to created user e.g. Admin
+    * User Role belongs to many `MenuItem` and `Permission` and `groups` models
 
-This package is used to handle sidebar and permissions
++ Team
+    *
+    * Team `hasMany`relationship with  `UserRole` model.
+    * Team member may be parent or child user that is owner or newly added user respectively.
+    * A team may have more than one member.
+    * Team may have more than one permission.
++ UserRoleGroup
+    * Group has one-to-many relation with users and many-to-many relation with `User Role`
+
++ Permission
+  * In Controller Check permission using `hasPermission` method.
+      ```
+      Auth::user()->hasPermission('');
+      ```
+  * Assign Permissions for created User Role.
+  * Permission belongs to `PermissionType` and one menuItem has many permissions .
++ PermissionType
+  * permission types has been created through seeder.
+  * Permission types are "READ", "CREATE", "UPDATE", "DELETE" and "MANAGE".
+
 
 
 
