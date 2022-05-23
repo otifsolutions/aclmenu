@@ -79,14 +79,15 @@ Either run the following command in the root directory of your project:
   
   | Method       | relation               | Description                                                                    |
   |------------:|---------------------:|-----------------------------------------------------------------------------------:|
-  | user_role   |One To Many (Inverse) | |
-  | group       |One To Many (Inverse) | |
-  | parent_team |One To Many (Inverse) | |
-  | child_team  |One To Many           | |
+  | user_role   |One To Many (Inverse) |Tells which user_role belong with this user     |
+  | group       |One To Many (Inverse) |Tells which group belong with this user         |
+  | parent_team |One To Many (Inverse) |Tells which parent_team belong with this user   |
+  | child_team  |One To Many           |Using this method child team can be accessed. A child team can have one or more than one users.|
   
 -  __team__ 
   
-     This method is used to find the child or parent account
+     This method is used to find the child or parent team
+   
 -  __hasPermission__
   
     This method is used to check the user has permission or not to access the page. 
@@ -94,6 +95,10 @@ Either run the following command in the root directory of your project:
 -  __hasPermissionMenuItem__
 
     Check the user has permission or not to access the menu item.
+   
+- __getTeamOwnerAttribute__
+
+    This method returns team owner from the team.
 
 5. Register the artisan command in database seeder after `$this->call(UsersTablesSeeder::class) ` in
    App/Database/Seeder/DatabaseSeeder file;
@@ -117,8 +122,9 @@ Either run the following command in the root directory of your project:
 
 ### Middleware
 
-- Middleware Handle an incoming request.
-- If request is coming from authenticated user, it will be redirected to the dashboard otherwise redirected to the
+- Middleware Handle the incoming request.
+- Middleware is set on route.  
+- If route has permission, it will be redirected to the dashboard otherwise redirected to the
   homepage. e.g. `->middleware('role:chart')`
 
 ### MODELS
@@ -155,7 +161,7 @@ Either run the following command in the root directory of your project:
 
   | Method       | relation  | Description                                                                    |
   |------------:|-------:|-----------------------------------------------------------------------------------:|
-  | permissions |   belongsToMany        |This method tells how many permissions belong with this `user_role` |
+  | permissions |   belongsToMany        |This method tells how many `permissions` belong with this `user_role` |
   | menu_items  |   belongsToMany        |This method tells how many menu_items belong with this `user_role`  |
   | team        |   One To Many (Inverse)|Tells which user role belongs with team                        |
   | users       |   One To Many          |Using this method users can be accessed from `users` table. a user role can one or more than one users.         |
