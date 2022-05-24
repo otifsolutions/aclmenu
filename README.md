@@ -20,7 +20,7 @@ Either run the following command in the root directory of your project:
  composer require otifsolutions/aclmenu
 ```
 
-### Steps
+### Usage
 
 1. Create User Role  ( via Seeder )
 
@@ -33,6 +33,7 @@ Either run the following command in the root directory of your project:
 
 2. Create Menu Items for Created `UserRole`.
     ```php
+    $id = UserRole::Where(['name' => 'ADMIN'])->get('id');
     MenuItem::updateOrCreate(
      ['id' => 1], [
          'order_number'=> 1,
@@ -43,28 +44,29 @@ Either run the following command in the root directory of your project:
          'generate_permission' => 'ALL'
       ])
          ->user_roles()
-         ->sync([1]);
+         ->sync($id);
     ```
+    `$id` is id of user role that is admin.
 
    | Option       | type          |Description                             |
-   |-------------:|--------------:|---------------------------------------:|
-   |`order_number`|  INT          |Number to show the item in sequence,    |
-   | `parent_id`  |  INT          |Id of any item as a parent menu item    |
+   |--------------|---------------|----------------------------------------|
+   |`order_number`|  INT          |Number to show the item in sequence.    |
+   | `parent_id`  |  INT          |Id of any item as a parent menu item.   |
    | `icon`       |  Varchar      |Icon of created menu item.              |
    | `name`       |  Varchar      |Show the name of created menu item.     |
-   | `route`      |  Varchar      |Middleware is set on route that restrict unauthorized user access    | 
+   | `route`      |  Varchar      |Middleware is set on route that restrict unauthorized user access.    | 
 
     - `generate_permission` is `ENUM` type of granted permission to the User Role, that are
       'ALL', 'MANAGE_ONLY', 'READ_ONLY'.
 
    | Option      |Description                                     |
-   |------------:|-----------------------------------------------:|
-   | All         | Allow user role to create, read, update, delete|
+   |-------------|------------------------------------------------|
+   | All         | Allow user role to create, read, update, delete.|
    | MANAGE_ONLY | Allow user role manage.                        |
    | READ_ONLY   | show that User can only read.                  | 
 
-3. Sync Permissions against Menu Items.
-
+3. - User role and permissions are created.
+   - Sync the permissions against menu items, so that user can have permissions to access the menu items.
     ```php
     {
     $userRole = UserRole::where(['name' => 'ADMIN'])->first();
@@ -72,109 +74,112 @@ Either run the following command in the root directory of your project:
     $userRole->permissions()->sync($permissions);
     }
     ```
-4. #### ACLUserTrait
 
-* Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model,
-* Following methods are used in this trait 
-  
-  | Method       | relation               | Description                                                                    |
-  |------------:|---------------------:|-----------------------------------------------------------------------------------:|
-  | user_role   |One To Many (Inverse) |Tells which user_role belong with this user     |
-  | group       |One To Many (Inverse) |Tells which group belong with this user         |
-  | parent_team |One To Many (Inverse) |Tells which parent_team belong with this user   |
-  | child_team  |One To Many           |Using this method child team can be accessed. A child team can have one or more than one users.|
-  
--  __team__ 
-  
-     This method is used to find the child or parent team
-   
--  __hasPermission__
-  
-    This method is used to check the user has permission or not to access the page. 
-
--  __hasPermissionMenuItem__
-
-    Check the user has permission or not to access the menu item.
-   
-- __getTeamOwnerAttribute__
-
-    This method returns team owner from the team.
-
-5. Register the artisan command in database seeder after `$this->call(UsersTablesSeeder::class) ` in
+4. Register the artisan command in database seeder after `$this->call(UsersTablesSeeder::class) ` in
    App/Database/Seeder/DatabaseSeeder file;
     ```
     Artisan::call('aclmenu:refresh');
     ```
-6.
 
-* In Controller Check permission using `hasPermission` method.
-    ```
-    Auth::user()->hasPermission('');
-    ```
-
-7. Run the seeder to implement the changes
+5. Run the seeder to implement the changes
     ```
     php artisan db:seed
     ```
-###config
-* Using this file user is redirected to the dashboard e.g. `/`
-* It shows that where user model is exist
+ #### ACLUserTrait
+
+* Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model,
+* Following methods are used in this trait
+
+  | Method      | relation             | Description                                                                    |
+  |-------------|----------------------|-----------------------------------------------------------------------------------|
+  | user_role   |one-to-many (Inverse) |This method returns user role from `UserRole` model to which user belongs.         |
+  | group       |one-to-many (Inverse) |This method returns group from `UserRoleGroup` model to which user belongs.        |
+  | parent_team |one-to-many (Inverse) |This method returns parent_team from `Team` model to which it belongs.             |
+  | child_team  |one-to-one            |This method returns user who creates the team. A child team has only one user.     |
+
+-  __team__
+
+   This method returns child or parent team.
+
+-  __hasPermission__
+    
+    * This method checks if the user has permission or not to access the page.
+    * Attribute is passed. e.g. READ, CREATE, UPDATE, or DELETE.
+    * If no attribute is passed, `READ` is considered default Attribute.
+    
+-  __hasPermissionMenuItem__
+
+    * This method checks if the user has permission or not to access the menu item.
+    * id of menu item is passed.
+    * boolean value is returned. e.g. true or false.
+
+- __getTeamOwnerAttribute__
+
+  This method returns team owner from the team.
+
+### Config
+*  Returns `redirect_url` if user is unauthorized e.g. `/`
+*  It shows where user model exists.
 
 ### Middleware
 
 - Middleware Handle the incoming request.
-- Middleware is set on route.  
-- If route has permission, it will be redirected to the dashboard otherwise redirected to the
-  homepage. e.g. `->middleware('role:chart')`
+- Middleware is set on route.
+- If route has permission, intended page will be returned otherwise user is redirected. e.g. `->middleware('role:dashboard')`
 
 ### MODELS
 
 + __MenuItem__
 
-  | Methode       | relation    |Description                                                                                           |          
-  |------------:|------------:|-------------------------------------------------------------------------------------------------------:|
-  | children    | one-to-many |Using this method submenu items can be accessed. One menuitem can have one or more than one child items.|
-  | permissions | one-to-many |Using this method permission can be accessed. One menuitem can have one or more than one permissions.   |
-  | user_roles  | many To Many|This method tells how many user_roles belongs with this menuitem.                                       |
+  | Methode     | relation    |Description                                                                                           |          
+  |-------------|-------------|--------------------------------------------------------------------------------------------------------|
+  | children    | one-to-many |This method returns submenu items from `MenuItem` model. One menuitem can have one or more child items.|
+  | permissions | one-to-many |This method returns list of permissions from `Permission` model. One menuitem can have one or more permissions.   |
+  | user_roles  | many-To-many|This method returns list of user_roles that belong to `MenuItem`.                                       |
 
 + __Permission__
 
   | Method      | relation               |   Description                                       |
-  |------------:|-----------------------:|----------------------------------------------------:|
-  | menu_item   |  One To Many (Inverse) |This method tells which menuitem belong with permissions |
-  | type        |  One To Many (Inverse) |Tells which permission type it belongs               |
+  |------------:|------------------------|-----------------------------------------------------|
+  | menu_item   |  one-to-many (Inverse) |This method return menuitem from `MenuItem` model that belongs to permission. |
+  | type        |  one-to-many (Inverse) |This method return permission type which belongs to permission.               |
 
-+ PermissionType
++ __PermissionType__
     * permission types has been created through seeder.
     * These types are "READ", "CREATE", "UPDATE", "DELETE" and "MANAGE".
 
 + __Team__
 
-  | Method      | relation |Description                                     |
-  |------------:|--------:|-----------------------:|
-  | owner       | One To Many (Inverse) |This method tells which user belongs with team  |
-  | permissions | belongToMany          |This method tells how permissions can be accessed by the teams
-  | members     | One To Many           |Using this method members can be fetched from `members` table. A team can have one or more than one members.
-  | user_roles  | One To Many           |Using this method user roles can be fetched from `user_roles` table. Team can have one or  more than one user roles
+  | Method      | relation |Description |
+  |-------------|----------|--------------------------------------------------------------------------------------------------------------|
+  | owner       | one-to-many(Inverse)  |This method returns user who creates team. A team can have only one user.                        |
+  | permissions | belongToMany          |This method returns how permissions can be accessed by the team.
+  | members     | one-to-many           |This method returns list of member from `User` model. A team can have one or more members.
+  | user_roles  | one-to-many           |This method returns list of user_roles from `UserRole` model. Team can have one or more user roles.
 
 + __User Role__
 
   | Method       | relation  | Description                                                                    |
-  |------------:|-------:|-----------------------------------------------------------------------------------:|
-  | permissions |   belongsToMany        |This method tells how many `permissions` belong with this `user_role` |
-  | menu_items  |   belongsToMany        |This method tells how many menu_items belong with this `user_role`  |
-  | team        |   One To Many (Inverse)|Tells which user role belongs with team                        |
-  | users       |   One To Many          |Using this method users can be accessed from `users` table. a user role can one or more than one users.         |
-  | groups      |   belongsToMany        |This method tells how many groups a user role can have            |
+  |-------------|--------|------------------------------------------------------------------------------------|
+  | permissions |   belongsToMany        |This method returns list of `permissions` from `Permission` model that belong to user_role. |
+  | menu_items  |   belongsToMany        |This method returns list of menu_items from `MenuItem` belong with user_role.  |
+  | team        |   one-to-many (Inverse)|This method returns team which belongs to user role.                    |
+  | users       |   one-to-many          |This method returns list of users from `User` model. A user role can one or more users.         |
+  | groups      |   belongsToMany        |This method returns groups that belong to UserRoleGroup.            |
 
 + __UserRoleGroup__
 
-  | Method      | relation            |Description                                                               |
-  |------------:|---------------------:|------------------------------------------------------------------------:|
-  | users       | One To Many          |Users can be fetched from `users` table using this method. One user role group can have many users|
-  | user_roles  |  belongsToMany       |This method tells how many user roles belong with this `UserRoleGroup`.  |
+  | Method      | relation        |Description                                                              |
+  |-------------|-----------------|-------------------------------------------------------------------------|
+  | users       | one-to-many     |This method returns list of users object. One user role group can have one or more users.|
+  | user_roles  | belongsToMany   |This method returns list of user_roles from `UserRole` that belong with `UserRoleGroup` model.  |
 
-
+  ### Teams
++ Create user.
++ 
++ When a user is created, it is assigned a role.
++ All roles have different permission which belongs with one or more than one menu items.
++ 
 
 
 
