@@ -152,15 +152,15 @@ Either run the following command in the root directory of your project:
 
   | Method      | relation |Description |
   |-------------|----------|--------------------------------------------------------------------------------------------------------------|
-  | owner       | one-to-many(Inverse)  |This method returns user who creates team. A team can have only one user.                        |
-  | permissions | belongToMany          |This method returns how permissions can be accessed by the team.
-  | members     | one-to-many           |This method returns list of member from `User` model. A team can have one or more members.
+  | owner       | one-to-many(Inverse)  |This method returns user who creates the team. A team can have only one owner.                        |
+  | permissions | belongToMany          |This method returns list of permissions from `Permission` model that belongs to `Team`.
+  | members     | one-to-many           |This method returns list of members. A team can have one or more members.
   | user_roles  | one-to-many           |This method returns list of user_roles from `UserRole` model. Team can have one or more user roles.
 
 + __User Role__
 
-  | Method       | relation  | Description                                                                    |
-  |-------------|--------|------------------------------------------------------------------------------------|
+  | Method       | relation  | Description                                                                                    |
+  |-------------|------------------------|------------------------------------------------------------------------------------|
   | permissions |   belongsToMany        |This method returns list of `permissions` from `Permission` model that belong to user_role. |
   | menu_items  |   belongsToMany        |This method returns list of menu_items from `MenuItem` belong with user_role.  |
   | team        |   one-to-many (Inverse)|This method returns team which belongs to user role.                    |
@@ -175,11 +175,21 @@ Either run the following command in the root directory of your project:
   | user_roles  | belongsToMany   |This method returns list of user_roles from `UserRole` that belong with `UserRoleGroup` model.  |
 
   ### Teams
-+ Create user.
-+ 
-+ When a user is created, it is assigned a role.
-+ All roles have different permission which belongs with one or more than one menu items.
-+ 
++ Team section has `members` and `user roles`.
++ User role has a section which contain a `name` and `actions`.
+  - `name` in user roles contains the name of roles that can be assigned to created users e.g. manager or employee.
+  - in `actions` contain different operations that can be performed on roles. 
+  - Multiple roles can be added in this section.
++ `member` section contain name, email,role and actions
+  - `name` is the name of user.
+  - `email` is user email of user.
+  - `2FA` is QR code for google authentication.  
+  - `role` is user role that user is assigned when team is created.
+  - `action` contains an update and delete operations that can be performed on members.  
++ User is created, it is assigned a role.
++ All roles have different permission which belongs with one or more menu items.
++ Role can access the menu item which is allowed.
+ 
 
 
 
