@@ -179,23 +179,22 @@ Either run the following command in the root directory of your project:
 
   ### Teams
 __Step. 1__
-+  First team is created with a `user_id` when creates new user.
++  First team is created with a `user_id`.
 
 __Step. 2__
 
-+ After creation of team, team owner creates user role and assign the permission to this role.
-+ User role has permissions that are assigned by the owner who creates user. 
++ Team owner creates user role.
 
 __Step. 3__
-  
-+ Depending on the role job, user role can assign the permissions that it has.
-+ User role can access the menu items which are allowed by user who creates the user role.
-+ `Permission_id` is fetched from `Permission` model to assign permission to user role.
+ 
++ Team owner assigns the permission. 
++ User role can access the menu items which are allowed by the owner.
++ `Permission` is fetched from `Permission` model to assign permission `$userRole->permissions()->sync($request['permissions']);`.
 + When user assigns the permissions, will sync the user role.
  
 __Step. 4__
-+ Members can be added by using the user role.
-+ When the new user is created it can do things which are assigned.
++ Members can be created by using the user role.
++ When the member is created, it can do things which are assigned.
 
     
 
