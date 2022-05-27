@@ -103,12 +103,12 @@ Either run the following command in the root directory of your project:
 -  __hasPermission__
     
     * This method checks if the user has permission or not to access the page.
-    * Returns `True` if condition is true otherwise return `false`;  
-    * Two Attributes are passed when calling the method e.g. `permissionTypeString` and `Permission`.
-    * One is `permissionTypeString` e.g. READ, CREATE, UPDATE, or DELETE.
-    * If no permissionTypeString is passed, _READ_ is considered default.
+    * Returns `True` if condition is true otherwise return `false`. 
+    * Two Attributes are passed when calling the method.
+    * One is `permissionTypeString` possible values are READ, CREATE, UPDATE, or DELETE.
+    * If no permissionTypeString is passed, READ is considered default.
     * Another attribute is `permission` which is the route of page.
-    * In this method if no permission is passed, _null_ is considered default and get the current permission from session.
+    * In this method if no permission is passed, current permission from sessions is fetched.
 
 -  __hasPermissionMenuItem__
 
@@ -168,7 +168,7 @@ Either run the following command in the root directory of your project:
   | menu_items  |   belongsToMany        |This method returns list of menu_items from `MenuItem` belong with user_role.  |
   | team        |   one-to-many (Inverse)|This method returns team which belongs to user role.                    |
   | users       |   one-to-many          |This method returns list of users from `User` model. A user role can one or more users.         |
-  | groups      |   belongsToMany        |This method returns groups that belong to UserRoleGroup.            |
+  | groups      |   belongsToMany        |This method returns groups that belong to UserRoleGroup.          |
 
 + __UserRoleGroup__
 
@@ -178,15 +178,26 @@ Either run the following command in the root directory of your project:
   | user_roles  | belongsToMany   |This method returns list of user_roles from `UserRole` that belong with `UserRoleGroup` model.  |
 
   ### Teams
-+ Admin user is created with key permissions.
-+ Team is created with a `user_id` when creates new user.
-+ After team is created Admin can create user role.
-+ Admin has all permissions that can be assigned to the team.
-+ User role of a team can access the menu item which is allowed by owner.
-+ Any other user role can not assign permissions except Admin, so admin can assign permissions.
-+ When team owner assigns the permissions, will sync the user role. `->user_roles()->sync($id);`
-  - Where `$id` is user role id from `UserRole` model.
-+ `Permission_id` is fetched from `Permission` model to assign permission to the user role.
+__Step. 1__
++  First team is created with a `user_id` when creates new user.
+
+__Step. 2__
+
++ After creation of team, team owner creates user role and assign the permission to this role.
++ User role has permissions that are assigned by the owner who creates user. 
+
+__Step. 3__
+  
++ Depending on the role job, user role can assign the permissions that it has.
++ User role can access the menu items which are allowed by user who creates the user role.
++ `Permission_id` is fetched from `Permission` model to assign permission to user role.
++ When user assigns the permissions, will sync the user role.
+ 
+__Step. 4__
++ Members can be added by using the user role.
++ When the new user is created it can do things which are assigned.
+
+    
 
 
 
