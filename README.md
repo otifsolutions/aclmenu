@@ -80,38 +80,41 @@ Either run the following command in the root directory of your project:
     ```
     Artisan::call('aclmenu:refresh');
     ```
-
 5. Run the seeder to implement the changes
     ```
     php artisan db:seed
     ```
  #### ACLUserTrait
 
-* Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model,
-* Following methods are used in this trait
+* __Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model,__
+* __Following methods are used in this trait__
 
   | Method      | relation             | Description                                                                    |
   |-------------|----------------------|-----------------------------------------------------------------------------------|
   | user_role   |one-to-many (Inverse) |This method returns user role from `UserRole` model to which user belongs.         |
   | group       |one-to-many (Inverse) |This method returns group from `UserRoleGroup` model to which user belongs.        |
   | parent_team |one-to-many (Inverse) |This method returns parent_team from `Team` model to which it belongs.             |
-  | child_team  |one-to-one            |This method returns user who creates the team. A child team has only one user.     |
+  | child_team  |one-to-one            |This method returns user who created the team.     |
 
 -  __team__
 
-   This method returns child or parent team.
+   This method returns the user who created the team or parent_team.
 
 -  __hasPermission__
     
     * This method checks if the user has permission or not to access the page.
-    * Attribute is passed. e.g. READ, CREATE, UPDATE, or DELETE.
-    * If no attribute is passed, `READ` is considered default Attribute.
-    
+    * Returns `True` if condition is true otherwise return `false`;  
+    * Two Attributes are passed when calling the method e.g. `permissionTypeString` and `Permission`.
+    * One is `permissionTypeString` e.g. READ, CREATE, UPDATE, or DELETE.
+    * If no permissionTypeString is passed, _READ_ is considered default.
+    * Another attribute is `permission` which is the route of page.
+    * In this method if no permission is passed, _null_ is considered default and get the current permission from session.
+
 -  __hasPermissionMenuItem__
 
     * This method checks if the user has permission or not to access the menu item.
-    * id of menu item is passed.
-    * boolean value is returned. e.g. true or false.
+    * Id of menu item is passed e.g. `menu_item_id`.
+    * Boolean value is returned. e.g. true or false.
 
 - __getTeamOwnerAttribute__
 
@@ -125,7 +128,7 @@ Either run the following command in the root directory of your project:
 
 - Middleware Handle the incoming request.
 - Middleware is set on route.
-- If route has permission, intended page will be returned otherwise user is redirected. e.g. `->middleware('role:dashboard')`
+- If route has permission, intended page will be returned otherwise user is redirected. e.g. `->middleware('role:/dashboard')`
 
 ### MODELS
 
@@ -175,21 +178,19 @@ Either run the following command in the root directory of your project:
   | user_roles  | belongsToMany   |This method returns list of user_roles from `UserRole` that belong with `UserRoleGroup` model.  |
 
   ### Teams
-+ Team section has `members` and `user roles`.
-+ User role has a section which contain a `name` and `actions`.
-  - `name` in user roles contains the name of roles that can be assigned to created users e.g. manager or employee.
-  - in `actions` contain different operations that can be performed on roles. 
-  - Multiple roles can be added in this section.
-+ `member` section contain name, email,role and actions
-  - `name` is the name of user.
-  - `email` is user email of user.
-  - `2FA` is QR code for google authentication.  
-  - `role` is user role that user is assigned when team is created.
-  - `action` contains an update and delete operations that can be performed on members.  
-+ User is created, it is assigned a role.
-+ All roles have different permission which belongs with one or more menu items.
-+ Role can access the menu item which is allowed.
- 
++ Admin user is created with key permissions.
++ Team is created with a `user_id` when creates new user.
++ After team is created Admin can create user role.
++ Admin has all permissions that can be assigned to the team.
++ User role of a team can access the menu item which is allowed by owner.
++ Any other user role can not assign permissions except Admin, so admin can assign permissions.
++ When team owner assigns the permissions, will sync the user role. `->user_roles()->sync($id);`
+  - Where `$id` is user role id from `UserRole` model.
++ `Permission_id` is fetched from `Permission` model to assign permission to the user role.
+
+
+
+
 
 
 
