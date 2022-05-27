@@ -105,16 +105,16 @@ Either run the following command in the root directory of your project:
     * This method checks if the user has permission or not to access the page.
     * Returns `True` if condition is true otherwise return `false`. 
     * Two Attributes are passed when calling the method.
-    * One is `permissionTypeString` possible values are READ, CREATE, UPDATE, or DELETE.
+    * One is `permissionTypeString`, possible values are READ, CREATE, UPDATE, or DELETE.
     * If no permissionTypeString is passed, READ is considered default.
-    * Another attribute is `permission` which is the route of page.
+    * Another attribute is `permission`, which is the route of page.
     * In this method if no permission is passed, current permission from sessions is fetched.
 
 -  __hasPermissionMenuItem__
 
     * This method checks if the user has permission or not to access the menu item.
-    * Id of menu item is passed e.g. `menu_item_id`.
-    * Boolean value is returned. e.g. true or false.
+    * Id of menu item is passed  `menu_item_id`.
+    * Boolean value is returned. Possible values ar true or false.
 
 - __getTeamOwnerAttribute__
 
