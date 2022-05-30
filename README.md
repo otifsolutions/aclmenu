@@ -30,7 +30,6 @@ Either run the following command in the root directory of your project:
            'name' => 'ADMIN'
         ]);
     ```
-
 2. Create Menu Items for Created `UserRole`.
     ```php
     $id = UserRole::Where(['name' => 'ADMIN'])->get('id');
@@ -54,7 +53,7 @@ Either run the following command in the root directory of your project:
    | `parent_id`  |  INT          |Id of any item as a parent menu item.   |
    | `icon`       |  Varchar      |Icon of created menu item.              |
    | `name`       |  Varchar      |Show the name of created menu item.     |
-   | `route`      |  Varchar      |Middleware is set on route that restrict unauthorized user access.    | 
+   | `route`      |  Varchar      |Route access the intended page.    | 
 
     - `generate_permission` is `ENUM` type of granted permission to the User Role, that are
       'ALL', 'MANAGE_ONLY', 'READ_ONLY'.
@@ -75,15 +74,29 @@ Either run the following command in the root directory of your project:
     }
     ```
 
-4. Register the artisan command in database seeder after `$this->call(UsersTablesSeeder::class) ` in
-   App/Database/Seeder/DatabaseSeeder file;
+4. Register the artisan command in database seeder in
+   App/Database/Seeder/DatabaseSeeder.php;
     ```
     Artisan::call('aclmenu:refresh');
     ```
+   Seeder run in this sequence.
+   ```
+   $this->call(UserRolesTableSeeder::class);
+   $this->call(MenuItemsTableSeeder::class);
+   $this->call(UserTableSeeder::class);
+   $this->call(TeamsTableSeeder::class);
+   Artisan::call('aclmenu:refresh');
+   $this->call(DefaultUserPermissionsSync::class);
+   ```
 5. Run the seeder to implement the changes
     ```
     php artisan db:seed
     ```
+ #### aclmenu:refresh
+    
++   This command seeds data in `Permission` model after checking the permission in `MeuItem` model.
++   Possible permissions are 'All' and "MANAGE_ONLY".
++   Default permission is `read`.
  #### ACLUserTrait
 
 * __Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model,__
@@ -102,13 +115,19 @@ Either run the following command in the root directory of your project:
 
 -  __hasPermission__
     
-    * This method checks if the user has permission or not to access the page.
+     __This method checks if the user has permission or not to access the page.__
+   
+   ```php
+      if (!Auth::user()->hasPermission('DELETE', '/dashboard'))
+          return 'error';
+      return view('dashboard');
+      ```
     * Returns `True` if condition is true otherwise return `false`. 
     * Two Attributes are passed when calling the method.
     * One is `permissionTypeString`, possible values are READ, CREATE, UPDATE, or DELETE.
     * If no permissionTypeString is passed, READ is considered default.
     * Another attribute is `permission`, which is the route of page.
-    * In this method if no permission is passed, current permission from sessions is fetched.
+    * If no permission is passed, current permission from sessions is fetched.
 
 -  __hasPermissionMenuItem__
 
@@ -122,13 +141,29 @@ Either run the following command in the root directory of your project:
 
 ### Config
 *  Returns `redirect_url` if user is unauthorized e.g. `/`
+   ```
+    if ($request->user() == null)
+    return redirect(config('laravelacl.redirect_url'));
+    ```
 *  It shows where user model exists.
 
 ### Middleware
 
 - Middleware Handle the incoming request.
-- Middleware is set on route.
-- If route has permission, intended page will be returned otherwise user is redirected. e.g. `->middleware('role:/dashboard')`
+- Middleware is set on route. `->middleware('role:/dashboard')`
+- If route has permission, intended page will be returned otherwise user is redirected. 
+
+__If user is null__
+  - Homepage is returned if no user is passed. e.g. `/`
+
+__If permission is null__
+  - Get the current path info for the request.
+    
+    `$permission = $request->path();`
+  - Current permission is fetched from the session using current path.
+    ```
+    \Session::put('current_permission', $permission);
+    ```  
 
 ### MODELS
 
@@ -179,7 +214,8 @@ Either run the following command in the root directory of your project:
 
   ### Teams
 __Step. 1__
-+  First team is created with a `user_id`.
++  Team is created with a `user_id`.
+
 
 __Step. 2__
 
@@ -187,15 +223,40 @@ __Step. 2__
 
 __Step. 3__
  
-+ Team owner assigns the permission. 
-+ User role can access the menu items which are allowed by the owner.
-+ `Permission` is fetched from `Permission` model to assign permission `$userRole->permissions()->sync($request['permissions']);`.
++ Team owner assigns the permission.
++ User role can access the menu items which belongs to the owner.
++ `Permission` is fetched from `Permission` model to assign permission,
+  
+  `$userRole->permissions()->sync($request['permissions']);`
 + When user assigns the permissions, will sync the user role.
  
 __Step. 4__
 + Members can be created by using the user role.
 + When the member is created, it can do things which are assigned.
 
+### Sidebar Creation
++ Use class for sidebar
+    ```html
+    <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main"></aside>
+    ```
++ Add class for link to return user on the page
+    ```html
+    <li class="nav-item mr-auto">
+        <a class="navbar-brand" href="{{ url('/dashboard') }}">
+           <div class="brand-logo"></div>
+         <h2 class="brand-text mb-0">Sweetspot</h2>
+       </a>
+    </li>
+    ```
++ __If the user_role is authenticated.__
+- Loop begins and check user has permission or not to access each menuitem.
+  ```html
+     (Auth::user()['user_role'])
+    (Auth::user()['user_role']->menu_items()->orderBy('order_number', 'ASC')->get() as $menuItem)
+  ```
+- Name of menu item is printed on the sidebar.
++ Than 
+    
     
 
 
