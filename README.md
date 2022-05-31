@@ -95,19 +95,19 @@ Either run the following command in the root directory of your project:
  #### aclmenu:refresh
     
 +   This command seeds data in `Permission` model after checking the permission in `MeuItem` model.
-+   Possible permissions are 'All' and "MANAGE_ONLY".
-+   Default permission is `read`.
++   Possible permissions are 'All', "READ" and "MANAGE_ONLY".
++   Default permission is `READ`.
  #### ACLUserTrait
 
-* __Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model,__
+* __Use `OTIFSolutions\ACLMenu\Traits\ACLUserTrait` in `User` model__
 * __Following methods are used in this trait__
 
-  | Method      | relation             | Description                                                                    |
+  | Method      | relation             | Description                                                                       |
   |-------------|----------------------|-----------------------------------------------------------------------------------|
   | user_role   |one-to-many (Inverse) |This method returns user role from `UserRole` model to which user belongs.         |
   | group       |one-to-many (Inverse) |This method returns group from `UserRoleGroup` model to which user belongs.        |
   | parent_team |one-to-many (Inverse) |This method returns parent_team from `Team` model to which it belongs.             |
-  | child_team  |one-to-one            |This method returns user who created the team.     |
+  | child_team  |one-to-one            |This method returns user who created the team.                                     |
 
 -  __team__
 
@@ -118,16 +118,16 @@ Either run the following command in the root directory of your project:
      __This method checks if the user has permission or not to access the page.__
    
    ```php
-      if (!Auth::user()->hasPermission('DELETE', '/dashboard'))
+      if (!Auth::user()->hasPermission('READ', '/dashboard'))
           return 'error';
       return view('dashboard');
-      ```
+   ```
     * Returns `True` if condition is true otherwise return `false`. 
     * Two Attributes are passed when calling the method.
     * One is `permissionTypeString`, possible values are READ, CREATE, UPDATE, or DELETE.
     * If no permissionTypeString is passed, READ is considered default.
     * Another attribute is `permission`, which is the route of page.
-    * If no permission is passed, current permission from sessions is fetched.
+    * If no permission is passed, current permission is stored in session.
 
 -  __hasPermissionMenuItem__
 
@@ -137,30 +137,39 @@ Either run the following command in the root directory of your project:
 
 - __getTeamOwnerAttribute__
 
-  This method returns team owner from the team.
+    This method returns team owner from the team.
+    return `$this['team']['owner']`
 
 ### Config
-*  Returns `redirect_url` if user is unauthorized e.g. `/`
++  Returns `redirect_url` if user is unauthorized e.g. `/`
    ```php
     if ($request->user() == null)
     return redirect(config('laravelacl.redirect_url'));
     ```
-*  It shows where user model exists.
++  It shows where user model exists.
+   
+   - If User not found than publish the config with path of `User` model.
+     `php artisan vendor:publish --provider="App/Models/User" --tag="config"`
+
 
 ### Middleware
 
-- Middleware Handle the incoming request.
-- Middleware is set on route. `->middleware('role:/dashboard')`
-- If route has permission, intended page will be returned otherwise user is redirected. 
++ Middleware handles the incoming request.
++ Middleware is set on route. such as
+  
+    ```php
+       Route::get('/dashboard', [DashboardController::class, 'dashboard'])->middleware('role:/dashboard'); 
+    ```
++ If route has permission, intended page will be returned otherwise user is redirected. 
 
-__If user is null__
-  - Homepage is returned if no user is passed. e.g. `/`
-
-__If permission is null__
+#### Middleware checks
++ If `Auth::User` not found, homepage is returned. e.g. `/`
+  
++ __If permission is null__
   - Get the current path info for the request.
     
     `$permission = $request->path();`
-  - Current permission is fetched from the session using current path.
+  - Current permission is stored in the session using current path.
     ```
     \Session::put('current_permission', $permission);
     ```  
@@ -215,7 +224,8 @@ __If permission is null__
   ### Teams
 __Step. 1__
 +  Team is created with a `user_id`.
-
+   
+   `Team::updateOrCreate(['user_id' => 1]);`
 
 __Step. 2__
 
@@ -223,77 +233,103 @@ __Step. 2__
 
 __Step. 3__
  
-+ Team owner assigns the permission.
-+ User role can access the menu items which belongs to the owner.
++ Owner assigns the permission to the created user role.
++ Owner can assign the permission which are accessible by him.
 + `Permission` is fetched from `Permission` model to assign permission,
++ When owner assigns the permissions, these permissions will sync using following code.
   
   `$userRole->permissions()->sync($request['permissions']);`
-+ When user assigns the permissions, will sync the user role.
  
 __Step. 4__
-+ Members can be created by using the user role.
-+ When the member is created, it can do things which are assigned.
++ Members can be added by using the user role.
++ It can perform the actions which are assigned.
 
 ### Sidebar Creation
-+ Use class for sidebar
-    ```html
-    <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main"></aside>
-    ```
-+ Add class for link to return user on the page
-    ```html
-    <li class="nav-item mr-auto">
-        <a class="navbar-brand" href="{{ url('/dashboard') }}">
-           <div class="brand-logo"></div>
-         <h2 class="brand-text mb-0">Sweetspot</h2>
-       </a>
-    </li>
-    ```
-+ __If the user_role is authenticated.__
-- Loop begins and check user has permission or not to access each menuitem.
-  ```html
-     (Auth::user()['user_role'])
-    (Auth::user()['user_role']->menu_items()->orderBy('order_number', 'ASC')->get() as $menuItem)
-  ```
-- Name of menu item is printed on the sidebar.
-+ Count if there is no submenu item then menu items are activated.
-```html
-  @if (count($menuItem['children']) == 0)
-@if($menuItem['parent_id'] === 0)
-<li class="nav-item {{ Request::is(strtolower(str_replace('/','',$menuItem['route']))) || Request::is(strtolower(str_replace('/','',$menuItem['route'])).'/*')?'active':'' }}">
-  <a href="{{ url($menuItem['route']) }}">
-    <i class="{{ $menuItem['icon'] }}"></i>
-    <span class="menu-title" data-i18n="{{ $menuItem['name'] }}">{{ $menuItem['name'] }}</span>
-  </a>
-</li>
-@endif  
-```  
 
-+ If any menu item has submenu item, it is opened.
++ Use the following class for side bar.
+  - It scrolls the menu items added.
+  - It links the sidebar to with the dashboard using route `href="{{ url('/dashboard') }}"`.
+
 ```html
-  <li class="nav-item has-sub {{ Request::is(strtolower(str_replace(' ','_',str_replace('/','',$menuItem['route']))).'/*') && (Auth::user()->sidebar_collapse == 0)?  'open' :'' }}">
-  <a href="#"><i class="{{ $menuItem['icon'] }}">
-  </i>
-    <span class="menu-title" data-i18n="{{ $menuItem['name'] }}">{{ $menuItem['name'] }}</span>
-  </a>
+<aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
+  <div class="sidenav-header">
+    <div class="main-menu menu-fixed menu-dark menu-accordion menu-shadow" data-scroll-to-active="true">
+      <div class="navbar-header bg-white">
+        <ul class="nav navbar-nav flex-row">
+          <li class="nav-item mr-auto">
+            <a class="navbar-brand" href="{{ url('/dashboard') }}">
+              <div class="brand-logo"></div>
+              <h2 class="brand-text mb-0">Your Project Name</h2>
+            </a>
+          </li>
+          <li class="nav-item nav-toggle">
+            <a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse" id="sidebar_collapse"><i class="feather icon-x d-block d-xl-none font-medium-4 black toggle-icon"></i><i class="toggle-icon feather icon-disc font-medium-4 d-none d-xl-block collapse-toggle-icon black" data-ticon="icon-disc"></i></a>
+          </li>
+        </ul>
+      </div>
+        <div class="main-menu-content mt-2">
+
+          Content of sidebar
+          
+      </div>
+    </div>
+  </div>
+</aside>
 ```
 
-+ If user has permission to access the submenu items then loop started and each submenu item is activated.
+##Content of sidebar
++ Sidebar is created using the permissions which are accessible by the user.
++ __If the user_role is authenticated.__
+    - Loop begins and checks if user has permission or not to access the menuitem.
+    - Name of menu item appears on the sidebar.
++ `Request::is`
+    - The `is` method allows to verify that the incoming request path matches a given pattern.   
++ If there is no submenu item then menu item is activated after comparison on the base of request.
++ If any menu item has submenu item, it will be opened after comparison on the bases of request.
++ For each menuitem if user has permission to access, the loop starts and each submenu item is activated.
   
 ```html
-    <ul class="menu-content">
-     @foreach($menuItem['children'] as $child)
-    @if (Auth::user()->hasPermissionMenuItem($child['id']))
-    <li class="nav-item {{ Request::is(strtolower(str_replace(' ','_',$child['name']))) || Request::is('*/'.strtolower(str_replace(' ','_',$child['name'])))?'active':'' }}">
-    <a href="{{ url($child['route']) }}"><i class="{{ $child['icon'] }}"></i><span class="menu-item" data-i18n="{{ $child['name'] }}">{{ $child['name'] }}</span></a>
-    </li>
-    @endif
-    @endforeach
+  <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
+     @if(Auth::user()['user_role'])
+      @foreach(Auth::user()['user_role']->menu_items()->orderBy('order_number', 'ASC')->get() as $menuItem)
+        @if (Auth::user()->hasPermissionMenuItem($menuItem['id']))
+          @if ($menuItem['show_on_sidebar'])
+               @if($menuItem['heading'])
+                  <li class="navigation-header">
+                         {{$menuItem['heading']}}
+                  </li>
+               @endif
+               @if (count($menuItem['children']) == 0)
+                  @if($menuItem['parent_id'] === 0)
+                   <li class="nav-item {{ Request::is(strtolower(str_replace('/','',$menuItem['route']))) || Request::is(strtolower(str_replace('/','',$menuItem['route'])).'/*')?'active':'' }}">
+                      <a href="{{ url($menuItem['route']) }}">
+                          <i class="{{ $menuItem['icon'] }}"></i>
+                          <span class="menu-title" data-i18n="{{ $menuItem['name'] }}">{{ $menuItem['name'] }}</span>
+                      </a>
+                   </li>
+                  @endif
+                  @else
+                    <li class="nav-item has-sub {{ Request::is(strtolower(str_replace(' ','_',str_replace('/','',$menuItem['route']))).'/*') && (Auth::user()->sidebar_collapse == 0)?  'open' :'' }}">
+                       <a href="#"><i class="{{ $menuItem['icon'] }}"></i>
+                        <span class="menu-title" data-i18n="{{ $menuItem['name'] }}">{{ $menuItem['name'] }}</span>
+                      </a>
+                      <ul class="menu-content">
+                         @foreach($menuItem['children'] as $child)
+                           @if (Auth::user()->hasPermissionMenuItem($child['id']))
+                             <li class="nav-item {{ Request::is(strtolower(str_replace(' ','_',$child['name']))) || Request::is('*/'.strtolower(str_replace(' ','_',$child['name'])))?'active':'' }}">
+                                <a href="{{ url($child['route']) }}"><i class="{{ $child['icon'] }}"></i><span class="menu-item" data-i18n="{{ $child['name'] }}">{{ $child['name'] }}</span></a>
+                             </li>
+                           @endif
+                         @endforeach
+                      </ul>
+                    </li>
+                  @endif
+            @endif
+          @endif
+        @endforeach
+       @endif
     </ul>
 ```
-
-
-
-
 
 
 
