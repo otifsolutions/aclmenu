@@ -148,8 +148,23 @@ Either run the following command in the root directory of your project:
     ```
 +  It shows where user model exists.
    
-   - If User not found than publish the config with path of `User` model.
-     `php artisan vendor:publish --provider="App/Models/User" --tag="config"`
+   - Change the path of `User` model. such as App\Models\Users
+   - Move the file into the Users directory.
+   - Make following changes in `config\provider` to Generate optimized autoload files.
+
+    ```php
+         'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => \App\Models\Users\User::class,
+        ],  
+   ];
+    ```
+   - run command `composer dump-autoload`
++ __Working__
+    - Calling `users` methode user access the `config.php` which return the user to `auth.php` `auth.providers.users.model`.
+    - Model returns `User` model
+    - This is how config.php locate the `User` model.
 
 
 ### Middleware
