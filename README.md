@@ -141,7 +141,7 @@ Either run the following command in the root directory of your project:
 
 ### Config
 *  Returns `redirect_url` if user is unauthorized e.g. `/`
-   ```
+   ```php
     if ($request->user() == null)
     return redirect(config('laravelacl.redirect_url'));
     ```
@@ -255,9 +255,41 @@ __Step. 4__
     (Auth::user()['user_role']->menu_items()->orderBy('order_number', 'ASC')->get() as $menuItem)
   ```
 - Name of menu item is printed on the sidebar.
-+ Than 
-    
-    
++ Count if there is no submenu item then menu items are activated.
+```html
+  @if (count($menuItem['children']) == 0)
+@if($menuItem['parent_id'] === 0)
+<li class="nav-item {{ Request::is(strtolower(str_replace('/','',$menuItem['route']))) || Request::is(strtolower(str_replace('/','',$menuItem['route'])).'/*')?'active':'' }}">
+  <a href="{{ url($menuItem['route']) }}">
+    <i class="{{ $menuItem['icon'] }}"></i>
+    <span class="menu-title" data-i18n="{{ $menuItem['name'] }}">{{ $menuItem['name'] }}</span>
+  </a>
+</li>
+@endif  
+```  
+
++ If any menu item has submenu item, it is opened.
+```html
+  <li class="nav-item has-sub {{ Request::is(strtolower(str_replace(' ','_',str_replace('/','',$menuItem['route']))).'/*') && (Auth::user()->sidebar_collapse == 0)?  'open' :'' }}">
+  <a href="#"><i class="{{ $menuItem['icon'] }}">
+  </i>
+    <span class="menu-title" data-i18n="{{ $menuItem['name'] }}">{{ $menuItem['name'] }}</span>
+  </a>
+```
+
++ If user has permission to access the submenu items then loop started and each submenu item is activated.
+  
+```html
+    <ul class="menu-content">
+     @foreach($menuItem['children'] as $child)
+    @if (Auth::user()->hasPermissionMenuItem($child['id']))
+    <li class="nav-item {{ Request::is(strtolower(str_replace(' ','_',$child['name']))) || Request::is('*/'.strtolower(str_replace(' ','_',$child['name'])))?'active':'' }}">
+    <a href="{{ url($child['route']) }}"><i class="{{ $child['icon'] }}"></i><span class="menu-item" data-i18n="{{ $child['name'] }}">{{ $child['name'] }}</span></a>
+    </li>
+    @endif
+    @endforeach
+    </ul>
+```
 
 
 
