@@ -153,9 +153,8 @@ Either run the following command in the root directory of your project:
     ]
     ```
 + __Working__
-    - Calling `users` method user access the `config.php` which return the user to `auth.php` `auth.providers.users.model`.
-    - Model returns `User` model
-    - This is how config.php locate the `User` model.
+    - When calling `users` method user access the `config.php` which return the user to `auth.providers.users.model`.
+    - This is how config.php provide the `User` model.
 
 
 ### Middleware
