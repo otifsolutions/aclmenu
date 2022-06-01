@@ -153,7 +153,7 @@ Either run the following command in the root directory of your project:
     ]
     ```
 + __Working__
-    - When calling `users` method user access the `config.php` which return the user to `auth.providers.users.model`.
+    - When calling `users` method user access the `config` which return user model from `auth.providers.users.model`.
     - This is how config.php provide the `User` model.
     
 ### Middleware
@@ -281,7 +281,7 @@ __Step. 4__
 </aside>
 ```
 
-##Content of sidebar
+###Content of sidebar
 + Sidebar is created using the permissions which are accessible by the user.
 + __If the user_role is authenticated.__
     - Loop begins and checks if user has permission or not to access the menuitem.
