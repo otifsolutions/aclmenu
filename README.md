@@ -146,15 +146,15 @@ Either run the following command in the root directory of your project:
     if ($request->user() == null)
     return redirect(config('laravelacl.redirect_url'));
     ```
-+  It provides path where user model exists.
+   
++  It has a path of laravel `config.php` which returns the user from model.
    ```php
     'models' => [
         'user'   => config('auth.providers.users.model')
     ]
     ```
-+ __Working__
-    - When calling `users` method user access the `config` which return user model from `auth.providers.users.model`.
-    - This is how config.php provide the `User` model.
++ Use this code to use config.
+    `config('laravelacl.models.user')`
     
 ### Middleware
 
@@ -162,11 +162,11 @@ Either run the following command in the root directory of your project:
 + Middleware is set on route. such as
   
     ```php
-       Route::get('/dashboard', [DashboardController::class, 'dashboard'])->middleware('role:/dashboard'); 
+       Route::get('/dashboard', [DashboardController::class, 'dashboard'])->middleware('role:dashboard'); 
     ```
 + If route has permission, intended page will be returned otherwise user is redirected. 
 
-#### Middleware checks
+#### How Middleware Works
 + If `Auth::User` not found, homepage is returned. e.g. `/`
   
 + __If permission is null__
@@ -245,14 +245,11 @@ __Step. 3__
   `$userRole->permissions()->sync($request['permissions']);`
  
 __Step. 4__
-+ Members can be added by using the user role.
-+ It can perform the actions which are assigned.
++ Team members can be added by using the created user role.
 
 ### Sidebar Creation
 
 + Use the following class for side bar.
-  - It scrolls the menu items added.
-  - It links the sidebar to the dashboard `href="{{ url('/dashboard') }}"`.
 
 ```html
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
@@ -281,16 +278,16 @@ __Step. 4__
 </aside>
 ```
 
-###Content of sidebar
-+ Sidebar is created using the permissions which are accessible by the user.
+### Content of sidebar
++ Sidebar is created using the permissions which are assigned.
 + __If the user_role is authenticated.__
-    - Loop begins and checks if user has permission or not to access the menuitem.
+    - Loop begins and checks if user has permission to access the menuitem.
     - Name of menu item appears on the sidebar.
-+ `Request::is`
-    - The `is` method allows to verify that the incoming request path matches a given pattern.   
-+ If there is no submenu item then menu item is activated after comparison on the base of request.
-+ If any menu item has submenu item, it will be opened after comparison on the bases of request.
-+ If user has permission to access each menuitem, the loop starts and each submenu item is activated.
++ `Request::is` checks if the incoming request matches to the menuitem route then item becomes active.
+  `Request::is(strtolower(str_replace('/','',$menuItem['route'])))`
+  
++ If any menu item has submenu item, it will be opened after matching the request.
++ If user has permission to access menuitem, the loop starts and matching submenu item becomes active.
   
 ```html
   <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
@@ -334,9 +331,6 @@ __Step. 4__
        @endif
     </ul>
 ```
-
-
-
 
 
 
