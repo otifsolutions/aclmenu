@@ -252,7 +252,7 @@ __Step. 4__
 
 + Use the following class for side bar.
   - It scrolls the menu items added.
-  - It links the sidebar to with the dashboard using route `href="{{ url('/dashboard') }}"`.
+  - It links the sidebar to the dashboard `href="{{ url('/dashboard') }}"`.
 
 ```html
 <aside class="sidenav bg-white navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-4 " id="sidenav-main">
@@ -290,7 +290,7 @@ __Step. 4__
     - The `is` method allows to verify that the incoming request path matches a given pattern.   
 + If there is no submenu item then menu item is activated after comparison on the base of request.
 + If any menu item has submenu item, it will be opened after comparison on the bases of request.
-+ For each menuitem if user has permission to access, the loop starts and each submenu item is activated.
++ If user has permission to access each menuitem, the loop starts and each submenu item is activated.
   
 ```html
   <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
