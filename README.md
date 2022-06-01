@@ -155,8 +155,7 @@ Either run the following command in the root directory of your project:
 + __Working__
     - When calling `users` method user access the `config.php` which return the user to `auth.providers.users.model`.
     - This is how config.php provide the `User` model.
-
-
+    
 ### Middleware
 
 + Middleware handles the incoming request.
