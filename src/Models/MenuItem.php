@@ -11,7 +11,9 @@ class MenuItem extends Model
     public function children() {
         return $this->hasMany(MenuItem::class,'parent_id');
     }
-
+    public function parent() {
+        return $this->belongsTo(MenuItem::class,'parent_id');
+    }
     public function permissions() {
         return $this->hasMany(Permission::class,'menu_item_id');
     }
