@@ -14,7 +14,7 @@ class AddUserRoleGroupIdToUsersTable extends Migration
     public function up()
     {
         Schema::table('users', function($table) {
-            $table->integer('user_role_group_id')->unsigned()->nullable()->after('team_id');
+            $table->bigInteger('user_role_group_id')->unsigned()->nullable()->after('team_id');
             $table->foreign('user_role_group_id')->references('id')->on('user_role_groups');
         });
     }

@@ -16,7 +16,7 @@ class AddDetailsToUsersTable extends Migration
         Schema::table('users', function($table) {
             $table->integer('user_role_id')->unsigned()->nullable()->after('id');
             $table->foreign('user_role_id')->references('id')->on('user_roles');
-            $table->integer('team_id')->unsigned()->nullable()->after('user_role_id');
+            $table->bigInteger('team_id')->unsigned()->nullable()->after('user_role_id');
             $table->foreign('team_id')->references('id')->on('teams');
         });
     }
