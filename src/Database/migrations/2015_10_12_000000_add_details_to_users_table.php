@@ -29,6 +29,8 @@ class AddDetailsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function($table) {
+            $table->dropForeign(['user_role_id']);
+            $table->dropForeign(['team_id']);
             $table->dropColumn('user_role_id');
             $table->dropColumn('team_id');
         });

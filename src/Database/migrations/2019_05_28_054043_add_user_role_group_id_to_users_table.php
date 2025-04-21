@@ -27,6 +27,7 @@ class AddUserRoleGroupIdToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function($table) {
+            $table->dropForeign(['user_role_group_id']);
             $table->dropColumn('user_role_group_id');
         });
     }
