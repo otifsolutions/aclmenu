@@ -20,7 +20,7 @@ class CreateMenuItemsTable extends Migration
             $table->string('icon')->nullable();
             $table->string('name');
             $table->string('route');
-            $table->enum('generate_permission',['ALL','MANAGE_ONLY'])->default('ALL');
+            $table->enum('generate_permission',['ALL','MANAGE_ONLY','READ_ONLY'])->default('ALL');
             $table->timestamps();
         });
     }
